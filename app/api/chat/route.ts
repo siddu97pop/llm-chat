@@ -7,7 +7,7 @@ const OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as ChatRequestBody;
-  const { messages, model, provider, ollamaUrl } = body;
+  const { messages, model, provider, ollamaUrl, ollamaApiKey } = body;
 
   if (!messages || !model || !provider) {
     return new Response(
@@ -65,9 +65,12 @@ export async function POST(request: Request) {
         process.env.NEXT_PUBLIC_OLLAMA_URL ??
         "http://localhost:11434";
 
+      const ollamaHeaders: HeadersInit = { "Content-Type": "application/json" };
+      if (ollamaApiKey) ollamaHeaders["Authorization"] = `Bearer ${ollamaApiKey}`;
+
       const upstream = await fetch(`${baseUrl}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: ollamaHeaders,
         body: ollamaBody(model, messages),
       });
 

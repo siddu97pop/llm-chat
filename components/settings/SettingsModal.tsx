@@ -17,22 +17,27 @@ import { useChatStore } from "@/lib/store/chat-store";
 
 export function SettingsModal() {
   const { settings, saveApiKey, clearApiKey, setOllamaUrl } = useSettings();
+  const setOllamaApiKey = useChatStore((s) => s.setOllamaApiKey);
+
   const [open, setOpen] = useState(false);
   const [keyInput, setKeyInput] = useState("");
-  const [ollamaInput, setOllamaInput] = useState(settings.ollamaUrl);
   const [showKey, setShowKey] = useState(false);
+  const [ollamaInput, setOllamaInput] = useState(settings.ollamaUrl);
+  const [ollamaKeyInput, setOllamaKeyInput] = useState(settings.ollamaApiKey);
+  const [showOllamaKey, setShowOllamaKey] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const hasKey = !!settings.openrouterApiKey;
 
-  // Check server-side cookie on open (key may have been set in a prior session)
+  const hasOrKey = !!settings.openrouterApiKey;
+  const hasOllamaKey = !!settings.ollamaApiKey;
+
+  // Check server-side cookie on open
   useEffect(() => {
     if (open) {
       fetch("/api/settings")
         .then((r) => r.json())
         .then((d) => {
           if (d.hasKey && !settings.openrouterApiKey) {
-            // Cookie exists but Zustand doesn't know — show placeholder
             setKeyInput("••••••••••••••••");
           }
         })
@@ -48,14 +53,22 @@ export function SettingsModal() {
     if (ollamaInput !== settings.ollamaUrl) {
       setOllamaUrl(ollamaInput);
     }
+    if (ollamaKeyInput !== settings.ollamaApiKey) {
+      setOllamaApiKey(ollamaKeyInput);
+    }
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleClearKey = async () => {
+  const handleClearOrKey = async () => {
     await clearApiKey();
     setKeyInput("");
+  };
+
+  const handleClearOllamaKey = () => {
+    setOllamaApiKey("");
+    setOllamaKeyInput("");
   };
 
   return (
@@ -74,7 +87,7 @@ export function SettingsModal() {
           <div className="space-y-2">
             <label className="text-sm font-medium">
               OpenRouter API Key
-              {hasKey && (
+              {hasOrKey && (
                 <span className="ml-2 text-xs text-green-500 font-normal">● set</span>
               )}
             </label>
@@ -95,8 +108,8 @@ export function SettingsModal() {
                   {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {hasKey && (
-                <Button variant="outline" size="sm" onClick={handleClearKey}>
+              {hasOrKey && (
+                <Button variant="outline" size="sm" onClick={handleClearOrKey}>
                   Clear
                 </Button>
               )}
@@ -124,8 +137,44 @@ export function SettingsModal() {
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Default: <code>http://localhost:11434</code>. Make sure Ollama is running
-              with <code>OLLAMA_ORIGINS=*</code> if using a custom URL.
+              Default: <code>http://localhost:11434</code>. Use a cloud Ollama URL if not running locally.
+            </p>
+          </div>
+
+          {/* Ollama API Key */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Ollama API Key
+              {hasOllamaKey && (
+                <span className="ml-2 text-xs text-green-500 font-normal">● set</span>
+              )}
+              <span className="ml-2 text-xs text-muted-foreground font-normal">optional</span>
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showOllamaKey ? "text" : "password"}
+                  placeholder="Required for cloud Ollama endpoints"
+                  value={ollamaKeyInput}
+                  onChange={(e) => setOllamaKeyInput(e.target.value)}
+                  className="pr-9 font-mono text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowOllamaKey((v) => !v)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showOllamaKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {hasOllamaKey && (
+                <Button variant="outline" size="sm" onClick={handleClearOllamaKey}>
+                  Clear
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Sent as <code>Authorization: Bearer &lt;key&gt;</code> to your Ollama endpoint.
             </p>
           </div>
 

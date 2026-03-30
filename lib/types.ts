@@ -65,6 +65,7 @@ export type Theme = "light" | "dark" | "system";
 export interface AppSettings {
   openrouterApiKey: string;
   ollamaUrl: string;
+  ollamaApiKey: string;
   selectedProvider: Provider;
   selectedModelId: string;
   theme: Theme;
@@ -109,6 +110,7 @@ export interface ChatRequestBody {
   provider: Provider;
   apiKey?: string;
   ollamaUrl?: string;
+  ollamaApiKey?: string;
 }
 
 // ─── SSE stream chunk shapes ──────────────────────────────────────────────────

@@ -35,6 +35,7 @@ function newConversation(provider: Provider, modelId: string): Conversation {
 const DEFAULT_SETTINGS: AppSettings = {
   openrouterApiKey: "",
   ollamaUrl: process.env.NEXT_PUBLIC_OLLAMA_URL ?? "http://localhost:11434",
+  ollamaApiKey: "",
   selectedProvider: "openrouter",
   selectedModelId: "",
   theme: "system",
@@ -97,6 +98,7 @@ interface ChatStore {
 
   setApiKey: (key: string) => void;
   setOllamaUrl: (url: string) => void;
+  setOllamaApiKey: (key: string) => void;
   setProvider: (provider: Provider) => void;
   setSelectedModel: (modelId: string) => void;
   setTheme: (theme: Theme) => void;
@@ -238,6 +240,9 @@ export const useChatStore = create<ChatStore>()(
 
       setOllamaUrl: (url) =>
         set((state) => ({ settings: { ...state.settings, ollamaUrl: url } })),
+
+      setOllamaApiKey: (key) =>
+        set((state) => ({ settings: { ...state.settings, ollamaApiKey: key } })),
 
       setProvider: (provider) =>
         set((state) => ({ settings: { ...state.settings, selectedProvider: provider } })),

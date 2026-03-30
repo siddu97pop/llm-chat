@@ -89,6 +89,7 @@ export function useChat(conversationId: string) {
         model: selectedModelId,
         provider: selectedProvider,
         ollamaUrl,
+        ollamaApiKey: settings.ollamaApiKey || undefined,
       };
 
       let response: Response;
