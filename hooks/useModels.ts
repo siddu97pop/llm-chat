@@ -31,6 +31,7 @@ export function useModels() {
         const params = new URLSearchParams({ provider });
         if (provider === "ollama") {
           params.set("ollamaUrl", settings.ollamaUrl);
+          if (settings.ollamaApiKey) params.set("ollamaApiKey", settings.ollamaApiKey);
         }
         const res = await fetch(`/api/models?${params}`);
         const json = await res.json();

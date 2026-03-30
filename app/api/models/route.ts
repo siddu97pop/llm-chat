@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     searchParams.get("ollamaUrl") ||
     process.env.NEXT_PUBLIC_OLLAMA_URL ||
     "http://localhost:11434";
+  const ollamaApiKey = searchParams.get("ollamaApiKey") ?? undefined;
 
   if (!provider || (provider !== "openrouter" && provider !== "ollama")) {
     return NextResponse.json(
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
       const models = await fetchOpenRouterModels();
       return NextResponse.json({ models });
     } else {
-      const models = await fetchOllamaModels(ollamaUrl);
+      const models = await fetchOllamaModels(ollamaUrl, ollamaApiKey);
       return NextResponse.json({ models });
     }
   } catch (err) {

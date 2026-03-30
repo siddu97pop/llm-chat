@@ -48,9 +48,13 @@ export function getOllamaContextLength(modelName: string): number {
 /**
  * Fetch locally available models from Ollama.
  */
-export async function fetchOllamaModels(baseUrl: string): Promise<ModelInfo[]> {
+export async function fetchOllamaModels(baseUrl: string, apiKey?: string): Promise<ModelInfo[]> {
+  const headers: HeadersInit = {};
+  if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`;
+
   const res = await fetch(`${baseUrl}/api/tags`, {
     cache: "no-store",
+    headers,
   });
 
   if (!res.ok) {
