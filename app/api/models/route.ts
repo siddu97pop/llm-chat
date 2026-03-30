@@ -8,8 +8,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get("provider") as Provider | null;
   const ollamaUrl =
-    searchParams.get("ollamaUrl") ??
-    process.env.NEXT_PUBLIC_OLLAMA_URL ??
+    searchParams.get("ollamaUrl") ||
+    process.env.NEXT_PUBLIC_OLLAMA_URL ||
     "http://localhost:11434";
 
   if (!provider || (provider !== "openrouter" && provider !== "ollama")) {
